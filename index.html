@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DREAM TIME - عبايات</title>
+
+  <!-- أسلوب شريط التحميل -->
+  <style>
+    
+    /* 🎨 #e0e0e0: لون خلفية شريط التحميل */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #e0e0e0;
+      z-index: 9999;
+      opacity: 0.7;
+      transition: all 0.4s ease;
+    }
+
+    /* 🎨 var(--btn-bg): لون مؤشر التقدم أثناء تحميل الصفحة */
+    .loader-bar {
+      height: 100%;
+      width: 0%;
+      background-color: var(--btn-bg);
+      transition: width 0.4s ease-in-out;
+    }
+
+    /* 🎨 #f5f5f5: خلفية مؤقت التحميل للصورة */
+    /* 📏 width: 100% & height: 150px: يملأ العرض ويحدد ارتفاع ثابت */
+    .image-loader {
+      width: 100%;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center; /* ✅ يجعل المحتوى في المنتصف أفقيًا وعموديًا */
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .image-loader::before {
+      content: url("LOGO.png"); /* ← هنا يمكنك وضع شعار المتجر */
+      width: 40px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    img, video {
+      max-width: 100%; /* 📏 الصور لا تتجاوز عرض الحاوية */
+      height: auto;
+      display: block;
+    }
+
+    :root {
+      --bg-light: #ffffff; /* 🎨 الخلفية الرئيسية للموقع */
+      --bg-dark: #0e0e0e; /* 🎨 خلفية الرأس */
+      --text-light: #ffffff; /* 🎨 نصوص الخلفيات الفاتحة */
+      --text-dark: #fbfbfb; /* 🎨 نصوص الخلفيات الداكنة */
+      --border-color: #ffffff; /* 🎨 لون الحواف البيضاء */
+      --btn-bg: #ff87f1; /* 🎨 لون الزر */
+      --btn-hover: #ffffff; /* 🎨 لون الزر عند التمرير عليه */
+      --input-border: #ff72d0; /* 🎨 حافة حقل البحث */
+      --search-bg: #fffdfd; /* 🎨 خلفية حقل البحث */
+      --search-text: rgb(0, 0, 0); /* 🎨 لون نص حقل البحث */
+      --link-color: #1e90ff; /* 🎨 لون الروابط */
+      --section-title-color: #000000; /* 🎨 لون عنوان "أهلاً بك..." في الوضع الفاتح */
+    }
+
+    body.dark-mode {
+      --bg-light: #121212;
+      --bg-dark: #121212;
+      --text-light: #ffffff;
+      --text-dark: #ffffff;
+      --search-bg: #ffffff;
+      --search-text: white;
+      --btn-bg: #ff82e6;
+      --btn-hover: #ffffff;
+      --input-border: #ff72d0;
+      --link-color: #1e90ff;
+      --section-title-color: #ffffff; /* 🎨 لون العنوان في الوضع الداكن */
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+
+    header {
+      background: linear-gradient(to right, var(--bg-dark), var(--btn-bg));
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center; /* ✅ يجعل كل شيء في المنتصف */
+      flex-direction: column;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .logo-container  img {
+      width: 150px;
+      margin-bottom: 5px;
+    }
+
+    .logo-container h3 {
+      font-size: 1.2rem;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    .search-bar {
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .search-bar input {
+      padding: 10px 30px 10px 15px;
+      border: 2px solid var(--input-border);
+      background-color: var(--search-bg);
+      color: var(--search-text);
+      border-radius: 30px;
+      width: 100%;
+      max-width: 250px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .search-bar input:focus {
+      background-color: white;
+      color: rgb(210, 16, 16);
+      border-color: #6d4ff0;
+    }
+
+    .search-bar svg {
+      position: absolute;
+      top: 12px;
+      left: 15px;
+      color: var(--btn-bg);
+      transition: color 0.3s ease;
+    }
+
+    .cart-icon {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* ✅ يجعل أيقونة العربة في المنتصف */
+    }
+
+    .cart-icon svg {
+      color: rgb(12, 48, 255);
+      width: 28px;
+      height: 28px;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 5px;
+      font-size: 10px;
+    }
+
+    .cart-label {
+      margin-top: 5px;
+      font-size: 14px;
+      color: rgb(250, 250, 250);
+      font-weight: bold;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .section-title {
+      text-align: center; /* ✅ يجعل العنوان في المنتصف */
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: var(--section-title-color); /* 🎨 لون العنوان حسب الوضع */
+    }
+
+    .section-description {
+      text-align: center; /* ✅ يجعل الوصف في المنتصف */
+      color: #ff7dee;
+      margin: 0 auto 20px;
+      font-size: 0.9rem;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      justify-content: center; /* ✅ يجعل الفلاتر في المنتصف */
+    }
+
+    .filter-type {
+      padding: 8px 12px;
+      border: 1px solid #ff8ae8;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-type:hover {
+      background: var(--btn-bg);
+      color: rgb(238, 226, 236);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* 📏 يتمدد حسب الشاشة */
+      gap: 15px;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr); /* 📏 يعرض بطاقتين في الصف */
+      }
+    }
+
+    @media (min-width: 992px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr); /* 📏 يعرض أربع بطاقات في الصف */
+      }
+    }
+
+    .card {
+      background: rgb(255, 255, 255);
+      border: 1px solid #ff8ae8;
+      border-radius: 15px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.627);
+    }
+
+    .card img {
+      width: 100%; /* 📏 يتمدد ليملأ العرض */
+      height: auto;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .card img:hover {
+      transform: scale(1.1);
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: hsl(0, 0%, 0%);
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: #0a0a0a;
+      margin-bottom: 10px;
+    }
+
+    .card-price {
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    .add-to-cart {
+      background: var(--btn-bg);
+      color: rgb(0, 0, 0);
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .add-to-cart:hover {
+      background: var(--btn-hover);
+      box-shadow: 0 4px 8px rgb(255, 120, 226);
+    }
+
+    footer {
+      background: linear-gradient(to right, var(--bg-dark), var(--btn-bg));
+      padding: 20px;
+      text-align: center; /* ✅ يجعل النصوص في المنتصف */
+      color: var(--text-dark);
+    }
+
+    footer a {
+      color: var(--link-color);
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .cart-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0);
+      display: none;
+      justify-content: center; /* ✅ يجعل المحتوى في المنتصف أفقيًا */
+      align-items: center; /* ✅ يجعل المحتوى في المنتصف عموديًا */
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .cart-modal-content {
+      background: rgba(0, 0, 0, 0.706);
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%; /* 📏 يتمدد لـ 90% من العرض */
+      max-width: 600px; /* 📏 عرض أقصى للنافذة المنبثقة */
+      box-shadow: 0 15px 30px rgb(255, 255, 255);
+      animation: fadeInUp 0.4s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center; /* ✅ يجعل المحتوى في المنتصف عموديًا */
+      gap: 15px;
+      padding: 12px 0;
+      border-bottom: 1px solid #ffffff;
+    }
+
+    .cart-item img {
+      width: 100px; /* 📏 عرض ثابت للصورة */
+      height:auto;
+      object-fit: cover;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center; /* ✅ يجعل عناصر الكميات في المنتصف */
+      gap: 10px;
+    }
+
+    .quantity-input {
+      width: 40px; /* 📏 عرض ثابت لمدخل الكمية */
+      text-align: center;
+      border: 1px solid #000000;
+      border-radius: 5px;
+    }
+
+    .quantity-btn {
+      background: var(--btn-bg);
+      color: rgb(0, 0, 0);
+      border: none;
+      padding: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+      background: var(--btn-hover);
+    }
+
+    .cart-total {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--btn-bg);
+      text-align: right; /* ✅ يجعل الإجمالي على اليمين */
+    }
+
+    .cart-close {
+      margin-top: 15px;
+      background: var(--btn-bg);
+      color: rgb(245, 10, 10);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%; /* 📏 يتمدد ليملأ الحاوية */
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .cart-close:hover {
+      background: var(--btn-hover);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--btn-bg);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* ✅ يجعل النص تحت الأيقونة */
+      gap: 4px;
+      transition: color 0.3s ease;
+    }
+
+    .theme-button span {
+      font-size: 0.8rem;
+      color: var(--btn-bg);
+    }
+
+    .theme-button:hover {
+      color: #ffffff;
+    }
+
+    .send-order-btn {
+      background: green;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1rem;
+      transition: background 0.3s ease;
+      margin-top: 20px;
+      width: 100%; /* 📏 يتمدد ليملأ الحاوية */
+    }
+
+    .send-order-btn:hover {
+      background: darkgreen;
+    }
+  </style>
+</head>
+<body>
+  <!-- شريط التحميل -->
+  <div class="loader">
+    <div class="loader-bar" id="loaderBar"></div>
+  </div>
+  <!-- زر الوضع الداكن -->
+  <button class="theme-button" id="darkThemeBtn" onclick="toggleDarkMode()">
+    <span>🌙</span>
+    <span>الوضع الداكن</span>
+  </button>
+  <!-- زر الوضع الفاتح -->
+  <button class="theme-button" id="lightThemeBtn" style="display: none;" onclick="toggleLightMode()">
+    <span>☀️</span>
+    <span>الوضع الفاتح</span>
+  </button>
+  <header>
+    <div class="logo-container">
+      <img src="LOGO.png" alt="شعار DREAM TIME">
+      <h1> عبايات </h1>
+      <h2> DREAM TIME </h2>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder=" البحث على عبايتك..." onkeyup="filterProducts()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+        <path fill="var(--btn-bg)" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+    </div>
+    <div class="cart-icon" onclick="toggleCart()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+        <path fill="white" d="M15 1H3v2h12V1zm0 18H3v-2h12v2zm6-7H3V5h18v2zM6 7h12v2H6V7z"/>
+      </svg>
+      <span class="cart-count" id="cartCount">0</span>
+      <span class="cart-label">عربة التسوق</span>
+    </div>
+  </header>
+  <main>
+    <div class="section-title"> أهلن بك في عالم الرقة والأنوثة</div>
+    <div class="section-description">اكتشفي تشكيلتنا المختارة من العبايات الفخمة: خامات فاخرة، تطريز راقٍ، توصيل سريع.</div>
+    <div class="filters">
+      <button class="filter-type" onclick="filterProductsByType('خليجي')">عبايات خليجي</button>
+      <button class="filter-type" onclick="filterProductsByType('عبايات سوداء تقليدي')">عبايات سوداء تقليدي</button>
+      <button class="filter-type" onclick="filterProductsByType('عبايات تطريز خفيف')">عبايات تطريز خفيف</button>
+      <button class="filter-type" onclick="filterProductsByType('عبايات ملونة')">عبايات ملونة</button>
+      <button class="filter-type" onclick="filterProductsByType('عبايات تركية')">عبايات تركية</button>
+      <button class="filter-type" onclick="filterProductsByType('عبايات مطرزة')">عبايات مطرزة</button>
+    </div>
+    <div class="grid" id="productGrid"></div>
+  </main>
+  <footer>
+    <h1>DREAM TIME</h1>
+    <p>عبايات من عالم الأناقة والأنوثة</p>
+    <div>
+      <a href="#">الرئيسية</a>
+    </div>
+    <p>&copy; 2025 DREAM TIME. جميع الحقوق محفوظة.</p>
+  </footer>
+  <!-- نافذة العربة -->
+  <div class="cart-modal" id="cartModal">
+    <div class="cart-modal-content">
+      <h2>عربة التسوق الخاصة بك</h2>
+      <div id="cartItems"></div>
+      <div class="cart-total" id="cartTotal">الإجمالي: $0.00</div>
+      <button class="send-order-btn" onclick="sendOrder()">أرسل طلبك عبر الواتساب</button>
+      <button class="cart-close red" onclick="emptyCart()">تفريغ العربة</button>
+      <button class="cart-close" onclick="toggleCart()">إغلاق</button>
+    </div>
+  </div>
+  <!-- أصوات -->
+  <audio id="addSound" src="sounds/add-to-cart.mp3"></audio>
+  <audio id="sendSound" src="sounds/send-order.mp3"></audio>
+  <audio id="emptySound" src="sounds/empty-cart.mp3"></audio>
+  <script>
+    // 🔄 دالة عرض شريط التحميل
+    function showLoader() {
+      const loaderBar = document.getElementById("loaderBar");
+      if (!loaderBar) return;
+      loaderBar.parentElement.style.display = "block";
+      loaderBar.style.width = "0%";
+      requestAnimationFrame(() => {
+        loaderBar.style.width = "100%";
+      });
+    }
+
+    // ⏳ دالة إخفاء شريط التحميل
+    function hideLoader(delay = 500) {
+      setTimeout(() => {
+        const loaderBar = document.getElementById("loaderBar");
+        if (!loaderBar) return;
+        loaderBar.style.width = "0%";
+        setTimeout(() => {
+          loaderBar.parentElement.style.opacity = "0";
+        }, 300);
+        // إخفاء الشريط تمامًا بعد 500 مللي ثانية
+        setTimeout(() => {
+          loaderBar.parentElement.style.display = "none";
+          loaderBar.parentElement.style.opacity = "1";
+        }, 800);
+      }, delay);
+    }
+
+    function emptyCart() {
+      localStorage.removeItem(STORAGE_KEY);
+      updateCartCount();
+      updateCartUI();
+      // ✅ تشغيل الصوت عند تفريغ العربة
+      document.getElementById("emptySound").play();
+    }
+function toggleDarkMode() {
+  document.body.classList.add("dark-mode");
+  localStorage.setItem('theme', 'dark');
+  document.getElementById('darkThemeBtn').style.display = 'none';
+  document.getElementById('lightThemeBtn').style.display = 'flex';
+}
+function toggleLightMode() {
+  document.body.classList.remove("dark-mode");
+  localStorage.setItem('theme', 'light');
+  document.getElementById('darkThemeBtn').style.display = 'flex';
+  document.getElementById('lightThemeBtn').style.display = 'none';
+}
+
+    const STORAGE_KEY = "dreamtime_cart";
+
+    function getCart() {
+      const cartStr = localStorage.getItem(STORAGE_KEY);
+      return cartStr ? JSON.parse(cartStr) : [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    }
+
+    function addToCart(productId) {
+      const product = window.products.find(p => p.id === productId);
+      if (!product) return;
+      // ✅ تشغيل الصوت عند الإضافة
+      document.getElementById("addSound").play();
+      let cart = getCart();
+      const existingItem = cart.find(item => item.id === product.id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+      saveCart(cart);
+      updateCartCount();
+      updateCartUI();
+    }
+
+    function changeQuantity(productId, delta) {
+      let cart = getCart();
+      const itemIndex = cart.findIndex(item => item.id === productId);
+      if (itemIndex !== -1) {
+        cart[itemIndex].quantity += delta;
+        if (cart[itemIndex].quantity <= 0) {
+          cart.splice(itemIndex, 1);
+        }
+        saveCart(cart);
+        updateCartCount();
+        updateCartUI();
+      }
+    }
+
+    function removeProductFromCart(productId) {
+      let cart = getCart();
+      cart = cart.filter(item => item.id !== productId);
+      saveCart(cart);
+      updateCartCount();
+      updateCartUI();
+    }
+
+    function updateCartCount() {
+      const countEl = document.getElementById("cartCount");
+      if (countEl) {
+        const totalItems = getCart().reduce((sum, item) => sum + item.quantity, 0);
+        countEl.textContent = totalItems;
+      }
+    }
+
+    function updateCartUI() {
+      const cartItemsContainer = document.getElementById("cartItems");
+      const cartTotal = document.getElementById("cartTotal");
+      if (!cartItemsContainer || !cartTotal) return;
+      const cart = getCart();
+      cartItemsContainer.innerHTML = "";
+      let total = 0;
+      cart.forEach((item) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "cart-item";
+        itemDiv.innerHTML = `
+          <div>
+            <img src="${item.image}" alt="${item.name}">
+            <span class="cart-item-name">${item.name}</span>
+          </div>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
+            <input type="text" class="quantity-input" value="${item.quantity}" readonly>
+            <button class="quantity-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+          </div>
+          <div><span>ريال يمني ${Math.round(item.price * item.quantity)}</span></div>
+        `;
+        cartItemsContainer.appendChild(itemDiv);
+        total += item.price * item.quantity;
+      });
+      cartTotal.textContent = "الإجمالي: ريال يمني "+ Math.round(total);
+    }
+
+    function sendOrder() {
+      const customerName = prompt("أدخل اسمك لاستلام البضاعة");
+      const customerAddress = prompt("أدخل عنوانك لاستلام البضاعة");
+      if (!customerName || !customerAddress) {
+        alert("يرجى إدخال اسمك وعنوانك.");
+        return;
+      }
+      // ✅ تشغيل الصوت عند إرسال الطلب
+      document.getElementById("sendSound").play();
+      const cart = getCart();
+      let message = `🎉 طلب جديد من ${customerName}
+`;
+      message += `📍 العنوان: ${customerAddress}
+`;
+      message += `🛒 سلة التسوق:
+`;
+      cart.forEach(item => {
+     message += `- ${item.name} x${item.quantity} - ريال يمني ${Math.round(item.price * item.quantity)}
+`;
+      });
+      message += `
+💰 الإجمالي: ريال يمني ${Math.round(cart.reduce((sum, item) => sum + item.price * item.quantity, 0))}`;
+      const whatsappNumber = "+966567435548"; // ← قم بتحديث الرقم حسب رغبتك
+      const url = `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`;
+      window.location.href = url;
+    }
+
+    function toggleCart() {
+      showLoader(); // 🔄 عرض الشريط عند فتح/إغلاق العربة
+      const modal = document.getElementById('cartModal');
+      modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+      updateCartUI();
+      setTimeout(() => {
+        hideLoader(); // ⏳ إخفاء الشريط بعد التحديث
+      }, 300);
+    }
+
+    function filterProducts() {
+      showLoader(); // 🔄 عرض الشريط عند بدء البحث
+      const searchInput = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = products.filter(product => product.name.toLowerCase().includes(searchInput));
+      renderProducts(filtered);
+      setTimeout(() => {
+        hideLoader(); // ⏳ إخفاء الشريط بعد الانتهاء من التحديث
+      }, 300);
+    }
+
+    function filterProductsByType(type) {
+      showLoader(); // 🔄 عرض الشريط عند بدء الفلترة
+      const filtered = products.filter(product => product.type === type || type === '');
+      renderProducts(filtered);
+      setTimeout(() => {
+        hideLoader(); // ⏳ إخفاء الشريط بعد الانتهاء من التحديث
+      }, 300);
+    }
+
+    function renderProducts(filteredProducts = products) {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+      filteredProducts.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <a href="product.html?id=${product.id}">
+            <div class="image-container">
+              <div class="image-loader"></div>
+              <img src="${product.image}" alt="${product.name}" onerror="this.nextElementSibling.style.display = 'none';" onload="this.previousElementSibling.style.display = 'none';">
+            </div>
+          </a>
+          <div class="card-body">
+            <div class="card-title">${product.name}</div>
+            <div class="card-desc">${product.description}</div>
+            <div class="card-price">ريال يمني ${Math.round(product.price)}</div>
+            <button class="add-to-cart" onclick="addToCart(${product.id})">أضف إلى السلة</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    const products = [
+      { id: 1, name: "خليجي", price: 10000, image:"صور المنتجات/خليجي/a.jpg", description: "عبايه ذات خامه ناعمه مثل الحرير.", type: "خليجي" },
+      { id: 2, name: "عبايات سوداء تقليدي", price: 7500, image: "صور المنتجات/عبايات سوداء تقليدي/a.jpg", description: "", type: "عبايات سوداء تقليدي" },
+      { id: 3, name: "عبايات تطريز خفيف", price: 8000, image: "صور المنتجات/عبايات تطريز خفيف/a.jpg", description: "", type: "عبايات تطريز خفيف" },
+      { id: 4, name: "عبايات ملونة", price: 12500, image: "صور المنتجات/عبايات ملونه/a.jpg", description: "", type: "عبايات ملونة" },
+      { id: 5, name: "عبايات تركية", price: 13000, image: "صور المنتجات/عبايات تركية/a.jpg", description: "", type: "عبايات تركية" },
+      { id: 6, name: "عبايات مطرزة", price: 15000, image: "صور المنتجات/عبايات مطرزة/a.jpg", description: "", type: "عبايات مطرزة" }
+    ];
+
+    window.products = products;
+  // التأكد من أن الوضع الداكن مفعل عند إعادة تحميل الصفحة
+  if (!document.body.classList.contains("dark-mode")) {
+    document.body.classList.add("dark-mode");
+  }
+
+  // 🔄 دالة عرض شريط التحميل
+  function showLoader() {
+    const loaderBar = document.getElementById("loaderBar");
+    if (!loaderBar) return;
+    loaderBar.parentElement.style.display = "block";
+    loaderBar.style.width = "0%";
+    requestAnimationFrame(() => {
+      loaderBar.style.width = "100%";
+    });
+  }
+
+
+   document.addEventListener("DOMContentLoaded", function () {
+  // 🔄 عرض شريط التحميل عند بدء التحميل
+  showLoader();
+  
+  // 🔁 استرجاع الوضع المحفوظ
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add("dark-mode");
+    document.getElementById('darkThemeBtn').style.display = 'none';
+    document.getElementById('lightThemeBtn').style.display = 'flex';
+  } else {
+    document.body.classList.remove("dark-mode");
+    document.getElementById('darkThemeBtn').style.display = 'flex';
+    document.getElementById('lightThemeBtn').style.display = 'none';
+  }
+
+  renderProducts();
+  updateCartCount();
+  updateCartUI();
+
+  setTimeout(() => {
+    hideLoader(); // ⏳ إخفاء الشريط بعد التحميل
+  }, 600);
+});
+  </script>
+</body>
+</html>
