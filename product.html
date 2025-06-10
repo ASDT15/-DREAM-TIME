@@ -154,7 +154,15 @@
       overflow: auto;
       background-color: rgba(0, 0, 0, 0.9);
     }
-
+.modal-content {
+  margin: auto;
+  display: block;
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.5s ease-in-out;
+  touch-action: pinch-zoom; /* تمكين التكبير والتصغير */
+}
     .modal-content {
       margin: auto;
       display: block;
@@ -217,6 +225,15 @@
 </div>
 
 <script>
+  // تمكين التكبير والتصغير عند النقر المزدوج
+document.getElementById("fullScreenImage").addEventListener("dblclick", function () {
+  const modalImg = document.getElementById("fullScreenImage");
+  if (modalImg.style.transform === "scale(2)") {
+    modalImg.style.transform = "scale(1)"; // تصغير
+  } else {
+    modalImg.style.transform = "scale(2)"; // تكبير
+  }
+});
   // 🔄 عرض شريط التحميل
   function showLoader() {
     const loaderBar = document.getElementById("loaderBar");
