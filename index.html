@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>DREAM TIME - عبايات</title>
   <style>
+    .cart-items-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* لتحسين التمرير على الأجهزة المحمولة */
+}
     /* CSS موجود + التعديلات الجديدة */
     .loader {
       position: fixed;
@@ -12,7 +17,7 @@
       left: 0;
       width: 100%;
       height: 2px;
-      background-color: #e0e0e0;
+      background-color: #e0e0e0;  /*لون الخلفيه */
       z-index: 9999;
       opacity: 0.7;
       transition: all 0.4s ease;
@@ -82,6 +87,7 @@
       --input-border: #ff72d0;
       --link-color: #1e90ff;
       --section-title-color: #ffffff;
+  
     }
     body {
       margin: 0;
@@ -89,6 +95,32 @@
       background: var(--bg-light);
       color: var(--text-light);
       transition: all 0.3s ease;
+    }
+    /* زر التحكم بالصوت (موجود أعلى يسار الصفحة) */
+    #soundButton {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      padding: 10px 15px;
+      background-color: #fdd7e6;
+      color: rgb(61, 54, 54);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    /* تصميم الصور لتكون مرتبطة بالصوت عند المرور عليها */
+    .store-image {
+      width: 200px;
+      margin: 20px;
+      border: 2px solid #ccc;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .store-image:hover {
+      transform: scale(1.05);
     }
     header {
       background: linear-gradient(to right, var(--bg-dark), var(--btn-bg));
@@ -323,11 +355,6 @@
         transform: translateY(0);
       }
     }
-    .cart-items-scroll {
-      max-height: 400px;
-      overflow-y: auto;
-      padding-right: 5px;
-    }
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
@@ -335,12 +362,6 @@
     @keyframes slideOut {
       from { transform: translateX(0); opacity: 1; }
       to { transform: translateX(100%); opacity: 0; }
-    }
-    .cart-item {
-      animation: slideIn 0.3s ease forwards;
-    }
-    .cart-item.deleted {
-      animation: slideOut 0.3s ease forwards;
     }
     .cart-item {
       display: flex;
@@ -418,12 +439,46 @@
       gap: 4px;
       transition: color 0.3s ease;
     }
+    /* تحسين زر "إتمام الطلب" */
+.send-order-btn {
+  background: #ff72d0;
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.send-order-btn:hover {
+  background: #ffffff;
+  color: #ff72d0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* تحسين نافذة العربة */
+.cart-modal-content {
+  background-color: var(--bg-light);
+  background: #090909;
+
+  padding: 30px;
+  border-radius: 20px;
+  animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
     .theme-button span {
       font-size: 0.8rem;
       color: var(--btn-bg);
     }
     .theme-button:hover {
-      color: #ffffff;
+      color: #1e1c1c;
     }
     .send-order-btn {
       background: green;
@@ -467,9 +522,50 @@
         padding: 8px 12px;
       }
     }
+    @keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.cart-item {
+  animation: slideIn 0.3s ease forwards;
+}
+/* أضف هذا الكود في قسم <style> */
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* المسافة بين الزر والشعار */
+  margin-bottom: 10px;
+}
+
+.order-status-btn {
+  background: transparent;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.order-status-btn:hover {
+  background:  #fffeff;
+  color: #000000;
+}
+
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script> 
 </head>
 <body>
+  <!-- 👇 زر التحكم بالصوت -->
+  <button id="soundButton">🔇 فتح الصوت</button>
   <!-- شريط التحميل -->
   <div class="loader">
     <div class="loader-bar" id="loaderBar"></div>
@@ -485,6 +581,10 @@
     <span>الوضع الفاتح</span>
   </button>
   <header>
+    <div class="left-section">
+  <button class="order-status-btn" onclick="window.location.href='order-status.html'">
+    حاله الطلب
+  </button>
     <div class="logo-container">
       <img src="LOGO.png" alt="شعار DREAM TIME">
       <h1> عبايات </h1>
@@ -531,15 +631,17 @@
       <h2>عربة التسوق الخاصة بك</h2>
       <div id="cartItems" class="cart-items-scroll"></div>
       <div class="cart-total" id="cartTotal">الإجمالي: $0.00</div>
-      <button class="send-order-btn" onclick="sendOrder()">أرسل طلبك عبر الواتساب</button>
+      <button class="send-order-btn" onclick="initiateCheckout()">إتمام الطلب</button>
       <button class="cart-close red" onclick="emptyCart()">تفريغ العربة</button>
       <button class="cart-close" onclick="toggleCart()">إغلاق</button>
     </div>
   </div>
+  <!-- 👇 ملف الصوت الخلفي -->
+  <audio id="backgroundAudio" src="NA.mp3" muted></audio>
   <!-- أصوات -->
-  <audio id="addSound" src="sounds/add-to-cart.mp3"></audio>
-  <audio id="sendSound" src="sounds/send-order.mp3"></audio>
-  <audio id="emptySound" src="sounds/empty-cart.mp3"></audio>
+  <audio id="addSound" src="athfo.mp3"></audio>
+  <audio id="sendSound" src="arsal.mp3"></audio>
+  <audio id="emptySound" src="tvrug.mp3"></audio>
   <script>
     function showLoader() {
       const loaderBar = document.getElementById("loaderBar");
@@ -593,7 +695,7 @@
     function addToCart(productId) {
       const product = window.products.find(p => p.id === productId);
       if (!product) return;
-      document.getElementById("addSound").play();
+      document.getElementById("addSound").play(); // تشغيل الصوت فوريًا
       let cart = getCart();
       const existingItem = cart.find(item => item.id === product.id);
       if (existingItem) {
@@ -624,7 +726,6 @@
       saveCart(cart);
       updateCartCount();
       updateCartUI();
-
       const item = document.querySelector(`.cart-item[data-id="${productId}"]`);
       if (item) {
         item.classList.add('deleted');
@@ -666,54 +767,46 @@
       });
       cartTotal.textContent = "الإجمالي: ريال يمني "+ Math.round(total);
     }
-    function sendOrder() {
-  const customerName = prompt("أدخل اسمك لاستلام البضاعة");
-  const customerAddress = prompt("أدخل عنوانك لاستلام البضاعة");
-
-  if (!customerName || !customerAddress) {
-    alert("يرجى إدخال اسمك وعنوانك.");
+    function initiateCheckout() {
+  const cart = getCart();
+  if (cart.length === 0) {
+    alert("عربتك فارغة! الرجاء إضافة منتجات.");
     return;
   }
 
-  document.getElementById("sendSound").play();
+  const user = JSON.parse(localStorage.getItem("dreamtime_user"));
+  if (!user || !user.phoneNumber) {
+    window.location.href = "login.html";
+    return;
+  }
 
-  const cart = getCart();
-  
-  // رسالة الطلب
-  let message = "🎉 طلب جديد من " + customerName + "\n";
-  message += "📍 العنوان: " + customerAddress + "\n";
-  message += "🛒 سلة التسوق:\n";
-
-  cart.forEach(item => {
-    message += "- " + item.name + " x" + item.quantity + " - ريال يمني " + Math.round(item.price * item.quantity) + "\n";
-  });
-
-  const total = Math.round(cart.reduce((sum, item) => sum + item.price * item.quantity, 0));
-  message += "\n💰 الإجمالي: ريال يمني " + total;
-
-  const whatsappNumber = "+966567435548"; // ✅ مع علامة + حتى يعمل على جميع الأجهزة
-
-  // تشفير الرسالة لجعلها آمنة في الرابط
-  const encodedMessage = encodeURIComponent(message);
-
-  // 🔗 روابط الواتساب
-  const whatsappAppURL = "whatsapp://send?phone=" + whatsappNumber.replace("+", "") + "&text=" + encodedMessage;
-  const whatsappWebURL = "https://wa.me/"  + whatsappNumber.replace("+", "") + "?text=" + encodedMessage;
-
-  // 📲 محاولة فتح تطبيق الواتساب
-  const link = document.createElement("a");
-  link.href = whatsappAppURL;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  // ⏳ إعادة التوجيه إلى واتساب ويب بعد 0.5 ثانية كخيار احتياطي
-  setTimeout(() => {
-    window.location.href = whatsappWebURL;
-  }, 500);
+  window.location.href = "payment.html";
 }
+    function sendOrder() {
+      const customerName = prompt("أدخل اسمك لاستلام البضاعة");
+      const customerAddress = prompt("أدخل عنوانك لاستلام البضاعة");
+      if (!customerName || !customerAddress) {
+        alert("يرجى إدخال اسمك وعنوانك.");
+        return;
+      }
+      document.getElementById("sendSound").play();
+      const cart = getCart();
+      const order = {
+        customerName,
+        customerAddress,
+        products: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        totalPrice: cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+      };
+      let orders = JSON.parse(localStorage.getItem("dreamtime_orders")) || [];
+      orders.push(order);
+      localStorage.setItem("dreamtime_orders", JSON.stringify(orders));
+      alert("تم إرسال طلبك بنجاح!");
+      emptyCart();
+    }
     function toggleCart() {
       showLoader();
       const modal = document.getElementById('cartModal');
@@ -763,38 +856,245 @@
         grid.appendChild(card);
       });
     }
-    const products = [
-      { id: 1, name: "خليجي", price: 10000, image:"صور المنتجات/خليجي/a.jpg", description: "عبايه ذات خامه ناعمه مثل الحرير.", type: "خليجي" },
-      { id: 2, name: "عبايات سوداء تقليدي", price: 7500, image: "صور المنتجات/عبايات سوداء تقليدي/a.jpg", description: "", type: "عبايات سوداء تقليدي" },
-      { id: 3, name: "عبايات تطريز خفيف", price: 8000, image: "صور المنتجات/عبايات تطريز خفيف/a.jpg", description: "", type: "عبايات تطريز خفيف" },
-      { id: 4, name: "عبايات ملونة", price: 12500, image: "صور المنتجات/عبايات ملونه/a.jpg", description: "", type: "عبايات ملونة" },
-      { id: 5, name: "عبايات تركية", price: 13000, image: "صور المنتجات/عبايات تركية/a.jpg", description: "", type: "عبايات تركية" },
-      { id: 6, name: "عبايات مطرزة", price: 15000, image: "صور المنتجات/عبايات مطرزة/a.jpg", description: "", type: "عبايات مطرزة" }
-    ];
-    window.products = products;
 
-    if (!document.body.classList.contains("dark-mode")) {
-      document.body.classList.add("dark-mode");
+    // تعديل جديد: تحميل المنتجات من localStorage
+    function loadProductsFromStorage() {
+      const storedProducts = localStorage.getItem("dreamtime_products");
+      if (storedProducts) {
+        window.products = JSON.parse(storedProducts);
+      } else {
+        // إذا لم تكن هناك منتجات في localStorage، نستخدم القائمة الافتراضية
+        window.products = [
+          { id: 1, name: "خليجي", price: 10000, image:"صور المنتجات/خليجي/a.jpg", description: "عبايه ذات خامه ناعمه مثل الحرير.", type: "خليجي" },
+          { id: 2, name: "عبايات سوداء تقليدي", price: 7500, image: "صور المنتجات/عبايات سوداء تقليدي/a.jpg", description: "", type: "عبايات سوداء تقليدي" },
+          { id: 3, name: "عبايات تطريز خفيف", price: 8000, image: "صور المنتجات/عبايات تطريز خفيف/a.jpg", description: "", type: "عبايات تطريز خفيف" },
+          { id: 4, name: "عبايات ملونة", price: 12500, image: "صور المنتجات/عبايات ملونه/a.jpg", description: "", type: "عبايات ملونة" },
+          { id: 5, name: "عبايات تركية", price: 13000, image: "صور المنتجات/عبايات تركية/a.jpg", description: "", type: "عبايات تركية" },
+          { id: 6, name: "عبايات مطرزة", price: 15000, image: "صور المنتجات/عبايات مطرزة/a.jpg", description: "", type: "عبايات مطرزة" }
+        ];
+      }
     }
 
+    // تعديل جديد: استدعاء دالة تحميل المنتجات عند تحميل الصفحة
     document.addEventListener("DOMContentLoaded", function () {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.body.classList.add("dark-mode");
-        document.getElementById('darkThemeBtn').style.display = 'none';
-        document.getElementById('lightThemeBtn').style.display = 'flex';
-      } else {
-        document.body.classList.remove("dark-mode");
-        document.getElementById('darkThemeBtn').style.display = 'flex';
-        document.getElementById('lightThemeBtn').style.display = 'none';
-      }
-      renderProducts();
+      loadProductsFromStorage(); // تحميل المنتجات من localStorage
+      renderProducts(); // عرض المنتجات
       updateCartCount();
       updateCartUI();
       setTimeout(() => {
         hideLoader();
       }, 600);
     });
+
+    // 👇 الكود الجديد لإدارة الصوت
+    const audio = document.getElementById('backgroundAudio');
+    const soundButton = document.getElementById('soundButton');
+    let soundEnabled = false;
+    function updateButton() {
+      if (soundEnabled) {
+        soundButton.innerHTML = "🔊 إيقاف الصوت";
+      } else {
+        soundButton.innerHTML = "🔇 فتح الصوت";
+      }
+    }
+    soundButton.addEventListener('click', () => {
+      if (!soundEnabled) {
+        audio.muted = false;
+        audio.play()
+          .then(() => {
+            soundEnabled = true;
+            updateButton();
+            // تحديث حالة الصوت في localStorage
+localStorage.setItem('soundEnabled', soundEnabled);
+          })
+          .catch(err => {
+            console.error("فشل تشغيل الصوت:", err);
+            alert("يرجى التفاعل مع الصفحة لتفعيل الصوت.");
+          });
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+        soundEnabled = false;
+        updateButton();
+        // تحديث حالة الصوت في localStorage
+localStorage.setItem('soundEnabled', soundEnabled);
+      }
+    });
+    function playSoundSilently() {
+      if (!soundEnabled && !audio.muted) return;
+      audio.muted = false;
+      audio.play()
+        .then(() => {
+          soundEnabled = true;
+          updateButton();
+        })
+        .catch(err => {
+          console.error("فشل التشغيل التلقائي:", err);
+        });
+    }
+    document.querySelectorAll('.card img').forEach(img => {
+      img.addEventListener('mouseenter', playSoundSilently);
+      img.addEventListener('touchstart', playSoundSilently);
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.body.classList.remove("dark-mode");
+  }
+  renderProducts();
+  updateCartCount();
+  updateCartUI();
+  setTimeout(() => {
+    hideLoader();
+  }, 600);
+});
+function toggleDarkMode() {
+  document.body.classList.add("dark-mode");
+  localStorage.setItem('theme', 'dark');
+  document.getElementById('darkThemeBtn').style.display = 'none';
+  document.getElementById('lightThemeBtn').style.display = 'flex';
+}
+
+function toggleLightMode() {
+  document.body.classList.remove("dark-mode");
+  localStorage.setItem('theme', 'light');
+  document.getElementById('darkThemeBtn').style.display = 'flex';
+  document.getElementById('lightThemeBtn').style.display = 'none';
+}
+document.addEventListener("DOMContentLoaded", function () {
+  const cartItemsContainer = document.getElementById("cartItems");
+
+  if (cartItemsContainer) {
+    const hammer = new Hammer(cartItemsContainer);
+
+    let startX = 0;
+
+    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+
+    hammer.on("panstart", function (event) {
+      startX = event.center.x;
+    });
+
+    hammer.on("panmove", function (event) {
+      const deltaX = event.center.x - startX;
+      cartItemsContainer.scrollLeft -= deltaX * 0.5; // ضبط السرعة حسب الرغبة
+    });
+  }
+});
+function initiateCheckout() {
+  // التحقق إذا كانت العربة فارغة
+  const cart = getCart();
+  if (cart.length === 0) {
+    alert("عربتك فارغة! الرجاء إضافة منتجات.");
+    return;
+  }
+
+  // التحقق إذا كان المستخدم مسجلاً دخوله
+  const user = JSON.parse(localStorage.getItem("dreamtime_user"));
+  if (!user || !user.phoneNumber) {
+    document.getElementById("loginModal").style.display = "flex"; // عرض نافذة تسجيل الدخول
+    return;
+  }
+
+  // إذا كان المستخدم مسجلاً، فنقوم بإرساله إلى صفحة الدفع
+  window.location.href = "payment.html";
+}
+// إرسال رمز التحقق (مثالي فقط، يجب استخدام خدمة حقيقية)
+function sendVerificationCode() {
+  const phoneNumber = document.getElementById("phoneNumberInput").value.trim();
+  if (!phoneNumber) {
+    alert("يرجى إدخال رقم الهاتف.");
+    return;
+  }
+
+  // في الواقع، هنا يجب إرسال رسالة نصية إلى العميل
+  // لكننا سنستخدم كوداً عشوائياً للمحاكاة
+  const code = Math.floor(1000 + Math.random() * 9000);
+  localStorage.setItem("dreamtime_verification_code", code.toString());
+  localStorage.setItem("dreamtime_user", JSON.stringify({ phoneNumber }));
+
+  document.getElementById("verificationContainer").style.display = "block";
+}
+// إرسال رمز التحقق (مثالي فقط، يجب استخدام خدمة حقيقية)
+function sendVerificationCode() {
+  const phoneNumber = document.getElementById("phoneNumberInput").value.trim();
+  if (!phoneNumber) {
+    alert("يرجى إدخال رقم الهاتف.");
+    return;
+  }
+
+  // في الواقع، هنا يجب إرسال رسالة نصية إلى العميل
+  // لكننا سنستخدم كوداً عشوائياً للمحاكاة
+  const code = Math.floor(1000 + Math.random() * 9000);
+  localStorage.setItem("dreamtime_verification_code", code.toString());
+  localStorage.setItem("dreamtime_user", JSON.stringify({ phoneNumber }));
+
+  document.getElementById("verificationContainer").style.display = "block";
+}
+
+// تحقق من رمز التحقق
+function verifyUser() {
+  const enteredCode = document.getElementById("verificationCodeInput").value.trim();
+  const storedCode = localStorage.getItem("dreamtime_verification_code");
+
+  if (enteredCode !== storedCode) {
+    alert("رمز التحقق غير صحيح.");
+    return;
+  }
+
+  alert("تم التحقق بنجاح!");
+  document.getElementById("loginModal").style.display = "none";
+
+  // انتقل إلى صفحة الدفع بعد التحقق
+  window.location.href = "payment.html";
+}
+// تحقق من التفضيل عند تحميل الصفحة
+window.addEventListener('load', () => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    document.getElementById('darkThemeBtn').style.display = 'none';
+    document.getElementById('lightThemeBtn').style.display = 'inline-block';
+  } else {
+    document.body.classList.remove('dark-mode');
+    document.getElementById('darkThemeBtn').style.display = 'inline-block';
+    document.getElementById('lightThemeBtn').style.display = 'none';
+  }
+});
+
+// عند نقر زر الوضع الداكن
+function toggleDarkMode() {
+  document.body.classList.add('dark-mode');
+  localStorage.setItem('theme', 'dark');
+  document.getElementById('darkThemeBtn').style.display = 'none';
+  document.getElementById('lightThemeBtn').style.display = 'inline-block';
+}
+
+// عند نقر زر الوضع الفاتح
+function toggleLightMode() {
+  document.body.classList.remove('dark-mode');
+  localStorage.setItem('theme', 'light');
+  document.getElementById('darkThemeBtn').style.display = 'inline-block';
+  document.getElementById('lightThemeBtn').style.display = 'none';
+}
+
   </script>
+  <!-- 👇 نافذة تسجيل الدخول -->
+<div id="loginModal" class="cart-modal">
+  <div class="cart-modal-content">
+    <h2>تسجيل الدخول</h2>
+    <p>يرجى إدخال رقم هاتفك:</p>
+    <input type="tel" id="phoneNumberInput" placeholder="رقم الهاتف" />
+    <button onclick="sendVerificationCode()">إرسال رمز التحقق</button>
+    <div id="verificationContainer" style="display:none;">
+      <p>أدخل رمز التحقق الذي تم إرساله إلى هاتفك:</p>
+      <input type="text" id="verificationCodeInput" placeholder="رمز التحقق (4 أرقام)" />
+      <button onclick="verifyUser()">تأكيد</button>
+    </div>
+    <button onclick="document.getElementById('loginModal').style.display='none'">إلغاء</button>
+  </div>
+</div>
 </body>
 </html>

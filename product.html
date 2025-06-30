@@ -22,7 +22,6 @@
       background-color: var(--btn-bg);
       transition: width 0.4s ease-in-out;
     }
-    /* galerie */
     .image-gallery {
       position: relative;
       width: 100%;
@@ -48,7 +47,6 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
       border: 3px solid var(--btn-bg);
     }
-    /* ⚡ الدوائر المؤشرة */
     .dots-container {
       display: flex;
       justify-content: center;
@@ -64,24 +62,13 @@
       transition: background-color 0.3s;
     }
     .dot.active {
-      background-color: var(--btn-bg); /* نفس لون الزر */
+      background-color: var(--btn-bg);
     }
-    /* 📱 سحب الشريحة على الشاشات اللمسية */
-    .image-gallery {
-      touch-action: pan-y pinch-zoom;
-    }
-    /* رسالة الخطأ */
     .error-message {
       color: red;
       font-weight: bold;
       margin-top: 10px;
     }
-    @media (max-width: 600px) {
-      .image-gallery {
-        height: 300px;
-      }
-    }
-    /* الألوان والوضعيات */
     :root {
       --bg-light: #ffffff;
       --text-light: #000000;
@@ -140,8 +127,6 @@
     a.back-link:hover {
       text-decoration: underline;
     }
-
-    /* 🖼️ نافذة عرض الصورة الكاملة */
     .modal {
       display: none;
       position: fixed;
@@ -154,15 +139,6 @@
       overflow: auto;
       background-color: rgba(0, 0, 0, 0.9);
     }
-.modal-content {
-  margin: auto;
-  display: block;
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
-  transition: transform 0.5s ease-in-out;
-  touch-action: pinch-zoom; /* تمكين التكبير والتصغير */
-}
     .modal-content {
       margin: auto;
       display: block;
@@ -171,8 +147,6 @@
       object-fit: contain;
       transition: transform 0.5s ease-in-out;
     }
-
-    /* 👆 زر الإغلاق */
     .close-modal {
       position: absolute;
       top: 15px;
@@ -183,7 +157,6 @@
       cursor: pointer;
       transition: color 0.3s ease;
     }
-
     .close-modal:hover,
     .close-modal:focus {
       color: #ccc;
@@ -191,333 +164,373 @@
   </style>
 </head>
 <body>
-<!-- 🔺 شريط التحميل العلوي -->
-<div class="loader">
-  <div class="loader-bar" id="loaderBar"></div>
-</div>
-<!-- 📦 حاوية المنتج -->
-<div class="product-container" id="productDetails">
-  <h2 id="productName">جارٍ تحميل المنتج...</h2>
-  <a href="" id="productLink">
-    <!-- 🖼️ galerie الصور -->
-    <div class="image-gallery" id="imageGallery">
-      <!-- سيتم تعبئة هذه الحاوية عبر JS -->
-    </div>
-  </a>
-  <!-- 📍 هنا نضع الدوائر -->
-  <div class="dots-container" id="dotsContainer"></div>
-  <!-- رسالة الخطأ -->
-  <div id="errorMsg" class="error-message" style="display:none;"></div>
-  <!-- 👇 العناصر المفقودة التي أضفتها -->
-  <p id="productDesc"></p>
-  <p id="productPrice"></p>
-  <!-- 🛒 زر الإضافة إلى السلة -->
-  <button class="add-to-cart-btn" onclick="addToCart(getProductIdFromURL())">أضف إلى السلة</button>
-  <br><br>
-  <!-- 🔙 رابط العودة للمتجر -->
-  <a href="index.html" class="back-link">العودة إلى المتجر</a>
-</div>
+  <!-- 👇 زر التحكم بالصوت -->
+  <button id="soundButton">🔇 فتح الصوت</button>
+  <!-- 🔺 شريط التحميل العلوي -->
+  <div class="loader">
+    <div class="loader-bar" id="loaderBar"></div>
+  </div>
+  <!-- 📦 حاوية المنتج -->
+  <div class="product-container" id="productDetails">
+    <h2 id="productName">جارٍ تحميل المنتج...</h2>
+   <div class="image-gallery" id="imageGallery">...</div>
+    <div class="dots-container" id="dotsContainer"></div>
+    <div id="errorMsg" class="error-message" style="display:none;"></div>
+    <p id="productDesc"></p>
+    <p id="productPrice"></p>
+    <button class="add-to-cart-btn" onclick="addToCart(getProductIdFromURL())">أضف إلى السلة</button>
+    <br><br>
+    <a href="index.html" class="back-link">العودة إلى المتجر</a>
+  </div>
+  <!-- 🖼️ نافذة عرض الصورة الكاملة -->
+  <div id="fullScreenImageModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="fullScreenImage" />
+  </div>
+  <!-- 👇 ملف الصوت الخلفي -->
+  <audio id="backgroundAudio" src="NA.mp3" muted></audio>
+  <audio id="addSound" src="athfo.mp3"></audio>
+  <script>
+    // ✅ تحميل المنتجات من localStorage
+    function loadProductsFromStorage() {
+      const storedProducts = localStorage.getItem("dreamtime_products");
+      if (storedProducts) {
+        window.products = JSON.parse(storedProducts);
+      } else {
+        window.products = [];
+      }
+    }
 
-<!-- 🖼️ نافذة عرض الصورة الكاملة -->
-<div id="fullScreenImageModal" class="modal">
-  <span class="close-modal">&times;</span>
-  <img class="modal-content" id="fullScreenImage" />
-</div>
-
-<script>
-  // تمكين التكبير والتصغير عند النقر المزدوج
-document.getElementById("fullScreenImage").addEventListener("dblclick", function () {
-  const modalImg = document.getElementById("fullScreenImage");
-  if (modalImg.style.transform === "scale(2)") {
-    modalImg.style.transform = "scale(1)"; // تصغير
-  } else {
-    modalImg.style.transform = "scale(2)"; // تكبير
-  }
-});
-  // 🔄 عرض شريط التحميل
-  function showLoader() {
-    const loaderBar = document.getElementById("loaderBar");
-    if (!loaderBar) return;
-    loaderBar.parentElement.style.display = "block";
-    loaderBar.style.width = "0%";
-    requestAnimationFrame(() => {
-      loaderBar.style.width = "100%";
-    });
-  }
-  // ⏳ إخفاء شريط التحميل
-  function hideLoader(delay = 500) {
-    setTimeout(() => {
+    // ✅ عرض شريط التحميل
+    function showLoader() {
       const loaderBar = document.getElementById("loaderBar");
       if (!loaderBar) return;
+      loaderBar.parentElement.style.display = "block";
       loaderBar.style.width = "0%";
-      setTimeout(() => {
-        loaderBar.parentElement.style.opacity = "0";
-      }, 300);
-      setTimeout(() => {
-        loaderBar.parentElement.style.display = "none";
-        loaderBar.parentElement.style.opacity = "1";
-      }, 800);
-    }, delay);
-  }
-  // ✅ دالة الحصول على ID من الرابط
-  function getProductIdFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return parseInt(urlParams.get('id'));
-  }
-  let currentIndex = 0;
-  // 🛠️ تحميل صورة واحدة مع معالجة الأخطاء
-  function loadImage(img, src, index) {
-    img.src = src;
-    img.alt = `صورة ${index + 1} من المنتج`;
-    img.style.display = "none";
-    img.onload = function () {
-      img.style.opacity = "1";
-      img.style.display = "block";
-    };
-    img.onerror = function () {
-      console.error(`⚠️ لم يتم تحميل الصورة: ${src}`);
-      this.src = 'https://via.placeholder.com/600x400?text=خطأ'; // صورة افتراضية عند الفشل
-      this.style.opacity = "1";
-      this.style.display = "block";
-    };
-  }
-  // 🚀 عرض الصور
-  function renderImage() {
-    const imageGallery = document.getElementById("imageGallery");
-    const dotsContainer = document.getElementById("dotsContainer");
-    const errorMsg = document.getElementById("errorMsg");
-    if (!imageGallery || !dotsContainer) return;
-
-    const productId = getProductIdFromURL();
-    const product = window.products.find(p => p.id === productId);
-
-    if (!product || !Array.isArray(product.images)) {
-      errorMsg.textContent = "لا توجد صور لهذا المنتج.";
-      errorMsg.style.display = "block";
-      return;
-    }
-
-    // نفرغ المحتوى القديم
-    imageGallery.innerHTML = '';
-    dotsContainer.innerHTML = '';
-
-    product.images.forEach((src, index) => {
-      const img = document.createElement("img");
-      loadImage(img, src, index);
-      imageGallery.appendChild(img);
-
-      // إنشاء الدائرة
-      const dot = document.createElement("div");
-      dot.classList.add("dot");
-      if (index === 0) dot.classList.add("active"); // أول دائرة مفعلة
-      dotsContainer.appendChild(dot);
-    });
-
-    currentIndex = 0; // تعيين الصورة الأولى كصورة حالية
-    showCurrentImage(); // عرض الصورة الحالية
-  }
-  function showCurrentImage() {
-    const images = document.querySelectorAll("#imageGallery img");  
-    const dots = document.querySelectorAll(".dot");
-    if (!images.length || !dots.length) return;
-
-    // إخفاء جميع الصور
-    images.forEach(img => img.style.display = "none");
-    // إزالة الفعالية من جميع الدوائر
-    dots.forEach(dot => dot.classList.remove("active"));
-
-    // عرض الصورة الحالية وتفعيل الدائرة المناسبة
-    images[currentIndex].style.display = "block";
-    dots[currentIndex].classList.add("active");
-  }
-  function nextImage() {
-    const images = document.querySelectorAll("#imageGallery img");
-    if (!images.length) return;
-    currentIndex++;
-    if (currentIndex >= images.length) currentIndex = 0; // العودة إلى البداية
-    showCurrentImage();
-  }
-  function prevImage() {
-    const images = document.querySelectorAll("#imageGallery img");
-    if (!images.length) return;
-    currentIndex--;
-    if (currentIndex < 0) currentIndex = images.length - 1; // العودة إلى النهاية
-    showCurrentImage();
-  }
-  function startAutoSlide() {
-    setInterval(nextImage, 5000); // تغيير الصورة كل 5 ثوانٍ
-  }
-  // 🔄 التفاعل عند النقر على الدائرة
-  function initDotsClickHandler() {
-    const dots = document.querySelectorAll(".dot");
-    dots.forEach((dot, index) => {
-      dot.addEventListener("click", () => {
-        currentIndex = index;
-        showCurrentImage();
+      requestAnimationFrame(() => {
+        loaderBar.style.width = "100%";
       });
-    });
-  }
-  // 📱 تعامل مع السحب (swipe)
-  let startX = 0;
-  let isDragging = false;
-  const imageGallery = document.getElementById("imageGallery");
-  imageGallery.addEventListener("touchstart", (e) => {
-    isDragging = true;
-    startX = e.touches[0].clientX;
-  });
-  imageGallery.addEventListener("touchmove", (e) => {
-    if (!isDragging) return;
-    const currentX = e.touches[0].clientX;
-    const diff = startX - currentX;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        nextImage(); // السحب من اليسار إلى اليمين = الصورة التالية
-      } else {
-        prevImage(); // السحب من اليمين إلى اليسار = الصورة السابقة
+    }
+
+    // ✅ إخفاء شريط التحميل
+    function hideLoader(delay = 500) {
+      setTimeout(() => {
+        const loaderBar = document.getElementById("loaderBar");
+        if (!loaderBar) return;
+        loaderBar.style.width = "0%";
+        setTimeout(() => {
+          loaderBar.parentElement.style.opacity = "0";
+        }, 300);
+        setTimeout(() => {
+          loaderBar.parentElement.style.display = "none";
+          loaderBar.parentElement.style.opacity = "1";
+        }, 800);
+      }, delay);
+    }
+
+    // ✅ الحصول على ID المنتج من الرابط
+    function getProductIdFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return parseInt(urlParams.get('id'));
+    }
+
+    // ✅ عرض تفاصيل المنتج
+    function displayProductDetails() {
+      showLoader();
+      loadProductsFromStorage(); // تحميل المنتجات من localStorage
+      const productId = getProductIdFromURL();
+      const product = window.products.find(p => p.id === productId);
+      if (!product) {
+        document.getElementById("productDetails").innerHTML = "<p>المنتج غير موجود.</p>";
+        hideLoader();
+        return;
       }
-      isDragging = false;
+      document.getElementById("productName").textContent = product.name;
+      document.getElementById("productDesc").textContent = product.description || "لا يوجد وصف.";
+      document.getElementById("productPrice").textContent = "السعر: ريال يمني " + Math.round(product.price);
+      renderImage(product); // عرض صور المنتج
+      startAutoSlide(); // بدء السلايد شو
+      initDotsClickHandler(); // تفعيل التفاعل مع الدوائر
+      hideLoader(300);
     }
-  });
-  imageGallery.addEventListener("touchend", () => {
-    isDragging = false;
-  });
-  // ✅ دالة عرض تفاصيل المنتج
-  function displayProductDetails() {
-    showLoader();
-    const productId = getProductIdFromURL();
-    const product = window.products.find(p => p.id === productId);
-    if (!product) {
-      document.getElementById("productDetails").innerHTML = "<p>المنتج غير موجود.</p>";
-      hideLoader();
-      return;
+
+    // ✅ عرض الصور (الدالة الوحيدة المُستخدمة)
+    function renderImage(product) {
+      const imageGallery = document.getElementById("imageGallery");
+      const dotsContainer = document.getElementById("dotsContainer");
+      if (!imageGallery || !dotsContainer) return;
+      imageGallery.innerHTML = '';
+      dotsContainer.innerHTML = '';
+      product.images.forEach((src, index) => {
+        const img = document.createElement("img");
+        loadImage(img, src, index);
+        imageGallery.appendChild(img);
+        const dot = document.createElement("div");
+        dot.classList.add("dot");
+        if (index === 0) dot.classList.add("active");
+        dotsContainer.appendChild(dot);
+      });
     }
-    document.getElementById("productName").textContent = product.name;
-    document.getElementById("productDesc").textContent = product.description || "لا يوجد وصف.";
-    document.getElementById("productPrice").textContent = "السعر: ريال يمني " + Math.round(product.price);
-    const productLink = document.getElementById("productLink");
-    if (productLink) productLink.href = "product.html?id=" + product.id;
-    renderImage(); // ✅ عرض صورة المنتج
-    startAutoSlide(); // بدء السلايد شو
-    initDotsClickHandler(); // تفعيل التفاعل مع الدوائر
-    hideLoader(300);
-  }
-  // 🛒 إضافة المنتج إلى السلة
-  function addToCart(productId) {
-    const product = window.products.find(p => p.id === productId);
-    if (!product) return;
-    let cart = JSON.parse(localStorage.getItem("dreamtime_cart")) || [];
-    const existingItem = cart.find(item => item.id === product.id);
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      cart.push({ ...product, quantity: 1 });
+
+    // ✅ تحميل صورة واحدة مع معالجة الأخطاء
+    function loadImage(img, src, index) {
+      img.src = src;
+      img.alt = `صورة ${index + 1} من المنتج`;
+      img.style.display = "none";
+      img.onload = function () {
+        img.style.opacity = "1";
+        img.style.display = "block";
+      };
+      img.onerror = function () {
+        console.error(`⚠️ لم يتم تحميل الصورة: ${src}`);
+        this.src = 'https://via.placeholder.com/600x400?text=خطأ';
+        this.style.opacity = "1";
+        this.style.display = "block";
+      };
     }
-    localStorage.setItem("dreamtime_cart", JSON.stringify(cart));
-    alert(product.name + " تم إضافته إلى السلة!");
-    const countEl = document.getElementById("cartCount");
-    if (countEl) {
-      countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    // ✅ إدارة الصوت
+    const audio = document.getElementById('backgroundAudio');
+    const soundButton = document.getElementById('soundButton');
+    let soundEnabled = false;
+
+    function updateButton() {
+      soundButton.innerHTML = soundEnabled ? "🔊 إيقاف الصوت" : "🔇 فتح الصوت";
     }
-  }
-  document.getElementById("productLink").addEventListener("click", function(e) {
-  e.preventDefault(); // منع التحويل الافتراضي
+
+    soundButton.addEventListener('click', () => {
+      if (!soundEnabled) {
+        audio.muted = false;
+        audio.play()
+          .then(() => {
+            soundEnabled = true;
+            updateButton();
+            localStorage.setItem('soundEnabled', soundEnabled);
+          })
+          .catch(err => {
+            console.error("فشل تشغيل الصوت:", err);
+            alert("يرجى التفاعل مع الصفحة لتفعيل الصوت.");
+          });
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+        soundEnabled = false;
+        updateButton();
+        localStorage.setItem('soundEnabled', soundEnabled);
+      }
+    });
+
+    // ✅ استعادة حالة الصوت والوضع الداكن
+    document.addEventListener("DOMContentLoaded", function () {
+      const savedSoundEnabled = localStorage.getItem('soundEnabled') === 'true';
+      if (savedSoundEnabled) {
+        audio.muted = false;
+        audio.play()
+          .then(() => {
+            soundEnabled = true;
+            updateButton();
+          })
+          .catch(err => {
+            console.error("فشل تشغيل الصوت:", err);
+          });
+      } else {
+        audio.muted = true;
+        soundEnabled = false;
+        updateButton();
+      }
+      const darkMode = localStorage.getItem('theme') === 'dark';
+      if (darkMode) {
+        document.body.classList.add("dark-mode");
+      }
+      displayProductDetails();
+    });
+
+    // ✅ إضافة المنتج إلى السلة
+    function addToCart(productId) {
+      const product = window.products.find(p => p.id === productId);
+      if (!product) return;
+      let cart = JSON.parse(localStorage.getItem("dreamtime_cart")) || [];
+      const existingItem = cart.find(item => item.id === product.id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+      localStorage.setItem("dreamtime_cart", JSON.stringify(cart));
+      const addSound = document.getElementById('addSound');
+      if (addSound) {
+        addSound.currentTime = 0;
+        addSound.play().catch(err => console.error("فشل تشغيل الصوت:", err));
+      }
+      alert(product.name + " تم إضافته إلى السلة!");
+      const countEl = document.getElementById("cartCount");
+      if (countEl) {
+        countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+      }
+    }
+
+  // ✅ فتح الصورة بحجم كامل
+document.getElementById("imageGallery").addEventListener("click", function (e) {
+  const img = e.target.closest("img");
+  if (!img || !img.src) return;
+
+  // منع التفاعل مع العنصر <a> الأصلي
+  e.stopPropagation();
+
+  const modal = document.getElementById("fullScreenImageModal");
+  const modalImg = document.getElementById("fullScreenImage");
+  modal.style.display = "block";
+  modalImg.src = img.src;
 });
-  // 🌗 تحديد الوضع الفاتح أو الداكن بناءً على الصفحة الرئيسية
-  document.addEventListener("DOMContentLoaded", function () {
-    const darkMode = localStorage.getItem('theme') === 'dark';
-    if (darkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
+
+// ✅ إغلاق النافذة عند النقر خارج الصورة أو على زر ×
+window.onclick = function (event) {
+  const modal = document.getElementById("fullScreenImageModal");
+  const imageGallery = document.getElementById("imageGallery");
+
+  // لا تغلق النافذة إذا النقر كان داخل حاوية الصور أو النافذة نفسها
+  if (event.target === modal && !imageGallery.contains(event.target)) {
+    modal.style.display = "none";
+  }
+};
+
+document.querySelector(".close-modal").addEventListener("click", function () {
+  document.getElementById("fullScreenImageModal").style.display = "none";
+});
+
+    // ✅ تمكين التكبير والتصغير عند النقر المزدوج
+    document.getElementById("fullScreenImage").addEventListener("dblclick", function () {
+      const modalImg = document.getElementById("fullScreenImage");
+      if (modalImg.style.transform === "scale(2)") {
+        modalImg.style.transform = "scale(1)";
+      } else {
+        modalImg.style.transform = "scale(2)";
+      }
+    });
+
+    // ✅ عرض الصور
+    function renderImage() {
+      const imageGallery = document.getElementById("imageGallery");
+      const dotsContainer = document.getElementById("dotsContainer");
+      const errorMsg = document.getElementById("errorMsg");
+      if (!imageGallery || !dotsContainer) return;
+      const productId = getProductIdFromURL();
+      const product = window.products.find(p => p.id === productId);
+      if (!product || !Array.isArray(product.images)) {
+        errorMsg.textContent = "لا توجد صور لهذا المنتج.";
+        errorMsg.style.display = "block";
+        return;
+      }
+      // نفرغ المحتوى القديم
+      imageGallery.innerHTML = '';
+      dotsContainer.innerHTML = '';
+      product.images.forEach((src, index) => {
+        const img = document.createElement("img");
+        loadImage(img, src, index);
+        imageGallery.appendChild(img);
+        // إنشاء الدائرة
+        const dot = document.createElement("div");
+        dot.classList.add("dot");
+        if (index === 0) dot.classList.add("active"); // أول دائرة مفعلة
+        dotsContainer.appendChild(dot);
+      });
+      currentIndex = 0; // تعيين الصورة الأولى كصورة حالية
+      showCurrentImage(); // عرض الصورة الحالية
     }
-    // تحميل المنتج
-    displayProductDetails();
-    setTimeout(() => {
-      hideLoader();
-    }, 600);
-  });
-  // ✅ استيراد المنتجات من نفس المتغير الذي في الصفحة الرئيسية
-  window.products = [
-    {
-      id: 1,
-      name: "خليجي",
-      price: 10000,
-      description: "عبايه ذات خامه ناعمه مثل الحرير.",
-      type: "خليجي",
-      image:"صور المنتجات/خليجي/a.jpg",
-      images: ["صور المنتجات/خليجي/a.jpg", "صور المنتجات/خليجي/b.jpg"]
-    },
-    {
-      id: 2,
-      name: "عبايات سوداء تقليدي",
-      price: 7500,
-      description: "",
-      type: "عبايات سوداء تقليدي",
-      image: "صور المنتجات/عبايات سوداء تقليدي/a.jpg",
-      images: ["صور المنتجات/عبايات سوداء تقليدي/a.jpg", "صور المنتجات/عبايات سوداء تقليدي/b.jpg"]
-    },
-    {
-      id: 3,
-      name: "عبايات تطريز خفيف",
-      price: 8000,
-      description: "",
-      type: "عبايات تطريز خفيف",
-      image: "صور المنتجات/عبايات تطريز خفيف/a.jpg",
-      images: ["صور المنتجات/عبايات تطريز خفيف/a.jpg", "صور المنتجات/عبايات تطريز خفيف/b.jpg", "صور المنتجات/عبايات تطريز خفيف/c.jpg"]
-    },
-    {
-      id: 4,
-      name: "عبايات ملونة",
-      price: 12500,
-      description: "",
-      type: "عبايات ملونة",
-      image: "صور المنتجات/عبايات ملونه/a.jpg",
-      images: ["صور المنتجات/عبايات ملونه/a.jpg", "صور المنتجات/عبايات ملونه/b.jpg"]
-    },
-    {
-      id: 5,
-      name: "عبايات تركية",
-      price: 13000,
-      description: "",
-      type: "عبايات تركية",
-      image: "صور المنتجات/عبايات تركية/a.jpg",
-      images: ["صور المنتجات/عبايات تركية/a.jpg", "صور المنتجات/عبايات تركية/b.jpg", "صور المنتجات/عبايات تركية/c.jpg"]
-    },
-    {
-      id: 6,
-      name: "عبايات مطرزة",
-      price: 15000,
-      description: "",
-      type: "عبايات مطرزة",
-      image: "صور المنتجات/عبايات مطرزة/a.jpg",
-      images: ["صور المنتجات/عبايات مطرزة/a.jpg", "صور المنتجات/عبايات مطرزة/b.jpg"]
+
+    function showCurrentImage() {
+      const images = document.querySelectorAll("#imageGallery img"); 
+      const dots = document.querySelectorAll(".dot");
+      if (!images.length || !dots.length) return;
+      // إخفاء جميع الصور
+      images.forEach(img => img.style.display = "none");
+      // إزالة الفعالية من جميع الدوائر
+      dots.forEach(dot => dot.classList.remove("active"));
+      // عرض الصورة الحالية وتفعيل الدائرة المناسبة
+      images[currentIndex].style.display = "block";
+      dots[currentIndex].classList.add("active");
     }
-  ];
 
-  // 🖼️ فتح الصورة بحجم كامل عند النقر عليها
-  document.getElementById("imageGallery").addEventListener("click", function (e) {
-    const img = e.target.closest("img");
-    if (!img || !img.src) return;
-
-    const modal = document.getElementById("fullScreenImageModal");
-    const modalImg = document.getElementById("fullScreenImage");
-
-    modal.style.display = "block";
-    modalImg.src = img.src;
-  });
-
-  // ✅ إغلاق النافذة عند النقر خارج الصورة
-  window.onclick = function (event) {
-    const modal = document.getElementById("fullScreenImageModal");
-    if (event.target === modal) {
-      modal.style.display = "none";
+    function nextImage() {
+      const images = document.querySelectorAll("#imageGallery img");
+      if (!images.length) return;
+      currentIndex++;
+      if (currentIndex >= images.length) currentIndex = 0;
+      showCurrentImage();
     }
-  };
 
-  // ✅ إغلاق النافذة باستخدام زر ×
-  document.querySelector(".close-modal").addEventListener("click", function () {
-    document.getElementById("fullScreenImageModal").style.display = "none";
-  });
-</script>
+    function prevImage() {
+      const images = document.querySelectorAll("#imageGallery img");
+      if (!images.length) return;
+      currentIndex--;
+      if (currentIndex < 0) currentIndex = images.length - 1;
+      showCurrentImage();
+    }
+
+    function startAutoSlide() {
+      setInterval(nextImage, 5000);
+    }
+
+    // 🔄 التفاعل عند النقر على الدائرة
+    function initDotsClickHandler() {
+      const dots = document.querySelectorAll(".dot");
+      dots.forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          currentIndex = index;
+          showCurrentImage();
+        });
+      });
+    }
+
+    // 📱 تعامل مع السحب (swipe)
+    let startX = 0;
+    let isDragging = false;
+    const imageGallery = document.getElementById("imageGallery");
+    imageGallery.addEventListener("touchstart", (e) => {
+      isDragging = true;
+      startX = e.touches[0].clientX;
+    });
+    imageGallery.addEventListener("touchmove", (e) => {
+      if (!isDragging) return;
+      const currentX = e.touches[0].clientX;
+      const diff = startX - currentX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          nextImage(); // السحب من اليسار إلى اليمين = الصورة التالية
+        } else {
+          prevImage(); // السحب من اليمين إلى اليسار = الصورة السابقة
+        }
+        isDragging = false;
+      }
+    });
+    imageGallery.addEventListener("touchend", () => {
+      isDragging = false;
+    });
+
+    // 🌗 تحديد الوضع الفاتح أو الداكن بناءً على الصفحة الرئيسية
+    document.addEventListener("DOMContentLoaded", function () {
+      const darkMode = localStorage.getItem('theme') === 'dark';
+      if (darkMode) {
+        document.body.classList.add("dark-mode");
+      } else {
+        document.body.classList.remove("dark-mode");
+      }
+      // تحميل المنتج
+      displayProductDetails();
+      setTimeout(() => {
+        hideLoader();
+      }, 600);
+    });
+    document.getElementById("imageGallery").addEventListener("click", function (e) {
+  e.preventDefault(); // منع التأثير الافتراضي للـ <a>
+  const img = e.target.closest("img");
+  if (!img || !img.src) return;
+
+  const modal = document.getElementById("fullScreenImageModal");
+  const modalImg = document.getElementById("fullScreenImage");
+  modal.style.display = "block";
+  modalImg.src = img.src;
+});
+  </script>
 </body>
 </html>

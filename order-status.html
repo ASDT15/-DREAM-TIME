@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>حالة الطلب - DREAM TIME</title>
+  <style>
+    :root {
+      --bg-light: #ffffff;
+      --bg-dark: #0e0e0e;
+      --text-light: #ffffff;
+      --text-dark: #fbfbfb;
+      --btn-bg: #ff87f1;
+      --btn-hover: #ffffff;
+      --input-border: #ff72d0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ffedf7, #ffe3f1);
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .cartoon-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 360"><path fill="%23ffe3f1" fill-opacity="0.3" d="M0,160L48,170.7C96,181,192,203,288,192C384,181,480,139,576,138.7C672,139,768,181,864,192C960,203,1056,181,1152,170.7C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat center center fixed;
+      background-size: cover;
+      z-index: -1;
+    }
+
+    .status-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .section-title {
+      color: var(--btn-bg);
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 3px;
+      background: var(--btn-bg);
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .status-card {
+      background: #fff5f9;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px dashed #ff72d0;
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .progress-bar {
+      background: #ffe3f1;
+      border-radius: 10px;
+      height: 8px;
+      margin: 30px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: var(--btn-bg);
+      height: 100%;
+      width: 60%;
+      transition: width 0.5s ease;
+    }
+
+    .action-btn {
+      background: var(--btn-bg);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(255, 114, 208, 0.4);
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .action-btn:hover {
+      background: #ff72d0;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 114, 208, 0.6);
+    }
+
+    .character {
+      position: absolute;
+      bottom: -50px;
+      right: -50px;
+      width: 200px;
+      pointer-events: none;
+      animation: wave 2s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(20deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="cartoon-bg"></div>
+  
+  <div class="status-container">
+    <img src="LOGO.png" alt="Logo" class="character" style="width: 150px;">
+    
+    <h2 class="section-title">حالة الطلب</h2>
+    
+    <div class="status-card">
+      <div class="status-item">
+        <span>رقم الطلب</span>
+        <span>#DT12345</span>
+      </div>
+      <div class="status-item">
+        <span>التاريخ</span>
+        <span>2023-10-15</span>
+      </div>
+      <div class="status-item">
+        <span>الحالة الحالية</span>
+        <span class="status-badge" style="color: #ff72d0; font-weight: bold;">قيد التجهيز</span>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+
+    <div class="status-card">
+      <h3 style="color: var(--btn-bg); text-align: center; margin-bottom: 20px;">تفاصيل الشحنة</h3>
+      <div class="status-item">
+        <span>العنوان</span>
+        <span>صنعاء، اليمن</span>
+      </div>
+      <div class="status-item">
+        <span>طريقة الدفع</span>
+        <span>دفع نقدي</span>
+      </div>
+      <div class="status-item">
+        <span>الشحن</span>
+        <span>شركة النقل السريع</span>
+      </div>
+    </div>
+
+    <button class="action-btn" onclick="window.location.href='index.html'">العودة إلى المتجر</button>
+  </div>
+</body>
+</html>
