@@ -137,11 +137,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-bottom: 15px;
+      margin-bottom: 1px;
     }
     .logo-container img {
       width: 150px;
-      margin-bottom: 5px;
+      margin-bottom: -25px;
     }
     .logo-container h3 {
       font-size: 1.2rem;
@@ -559,6 +559,30 @@
   background:  #fffeff;
   color: #000000;
 }
+.size-controls {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.size-btn {
+  background: var(--btn-bg);
+  color: #000;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.size-btn:hover {
+  background: var(--btn-hover);
+}
+.size-btn.active {
+  background-color: var(--btn-bg); /* لون مميز لتحديد الحجم المُختار */
+  color: white;
+  font-weight: bold;
+}
 
   </style>
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script> 
@@ -582,9 +606,6 @@
   </button>
   <header>
     <div class="left-section">
-  <button class="order-status-btn" onclick="window.location.href='order-status.html'">
-    حاله الطلب
-  </button>
     <div class="logo-container">
       <img src="LOGO.png" alt="شعار DREAM TIME">
       <h1> عبايات </h1>
@@ -602,7 +623,7 @@
       </svg>
       <span class="cart-count" id="cartCount">0</span>
       <span class="cart-label">عربة التسوق</span>
-    </div>
+    </div> <button class="order-status-btn" onclick="window.location.href='order-status.html'">حالة الطلب</button>
   </header>
   <main>
     <div class="section-title"> أهلن بك في عالم الرقة والأنوثة</div>
@@ -614,16 +635,19 @@
       <button class="filter-type" onclick="filterProductsByType('عبايات ملونة')">عبايات ملونة</button>
       <button class="filter-type" onclick="filterProductsByType('عبايات تركية')">عبايات تركية</button>
       <button class="filter-type" onclick="filterProductsByType('عبايات مطرزة')">عبايات مطرزة</button>
+      
     </div>
     <div class="grid" id="productGrid"></div>
   </main>
   <footer>
+ 
+</div>
     <h1>DREAM TIME</h1>
     <p>عبايات من عالم الأناقة والأنوثة</p>
     <div>
       <a href="#">الرئيسية</a>
     </div>
-    <p>&copy; 2025 DREAM TIME. جميع الحقوق محفوظة.</p>
+  <p>&copy; 2025 DREAM TIME. جميع الحقوق محفوظة.</p>
   </footer>
   <!-- نافذة العربة -->
   <div class="cart-modal" id="cartModal">
@@ -634,6 +658,7 @@
       <button class="send-order-btn" onclick="initiateCheckout()">إتمام الطلب</button>
       <button class="cart-close red" onclick="emptyCart()">تفريغ العربة</button>
       <button class="cart-close" onclick="toggleCart()">إغلاق</button>
+      
     </div>
   </div>
   <!-- 👇 ملف الصوت الخلفي -->
@@ -706,6 +731,22 @@
       saveCart(cart);
       updateCartCount();
       updateCartUI();
+      function addToCart(productId, size = 'S') {
+  const product = window.products.find(p => p.id === productId);
+  if (!product) return;
+  document.getElementById("addSound").play(); // تشغيل الصوت فوريًا
+  let cart = getCart();
+  const existingItem = cart.find(item => item.id === product.id);
+  if (existingItem) {
+    existingItem.quantity += 1;
+    existingItem.size = size; // تحديث الحجم إذا كان المنتج موجودًا بالفعل
+  } else {
+    cart.push({ ...product, quantity: 1, size: size });
+  }
+  saveCart(cart);
+  updateCartCount();
+  updateCartUI();
+}
     }
     function changeQuantity(productId, delta) {
       let cart = getCart();
@@ -739,44 +780,44 @@
         countEl.textContent = totalItems;
       }
     }
-    function updateCartUI() {
-      const cartItemsContainer = document.getElementById("cartItems");
-      const cartTotal = document.getElementById("cartTotal");
-      if (!cartItemsContainer || !cartTotal) return;
-      const cart = getCart();
-      cartItemsContainer.innerHTML = "";
-      let total = 0;
-      cart.forEach((item) => {
-        const itemDiv = document.createElement("div");
-        itemDiv.className = "cart-item";
-        itemDiv.setAttribute('data-id', item.id);
-        itemDiv.innerHTML = `
-          <div>
-            <img src="${item.image}" alt="${item.name}">
-            <span class="cart-item-name">${item.name}</span>
-          </div>
-          <div class="quantity-controls">
-            <button class="quantity-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
-            <input type="text" class="quantity-input" value="${item.quantity}" readonly>
-            <button class="quantity-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
-          </div>
-          <div><span>ريال يمني ${Math.round(item.price * item.quantity)}</span></div>
-        `;
-        cartItemsContainer.appendChild(itemDiv);
-        total += item.price * item.quantity;
-      });
-      cartTotal.textContent = "الإجمالي: ريال يمني "+ Math.round(total);
-    }
+function updateCartUI() {
+  const cartItemsContainer = document.getElementById("cartItems");
+  const cartTotal = document.getElementById("cartTotal");
+  if (!cartItemsContainer || !cartTotal) return;
+  const cart = getCart();
+  cartItemsContainer.innerHTML = "";
+  let total = 0;
+  cart.forEach((item) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "cart-item";
+    itemDiv.setAttribute('data-id', item.id);
+    itemDiv.innerHTML = `
+      <div>
+        <img src="${item.image}" alt="${item.name}">
+        <span class="cart-item-name">${item.name}</span>
+      </div>
+      <div class="quantity-controls">
+        <button class="quantity-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
+        <input type="text" class="quantity-input" value="${item.quantity}" readonly>
+        <button class="quantity-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+      </div>
+      <div class="size-controls">
+        <button class="size-btn ${item.size === 'S' ? 'active' : ''}" onclick="changeSize(${item.id}, 'S')">S</button>
+        <button class="size-btn ${item.size === 'M' ? 'active' : ''}" onclick="changeSize(${item.id}, 'M')">M</button>
+        <button class="size-btn ${item.size === 'L' ? 'active' : ''}" onclick="changeSize(${item.id}, 'L')">L</button>
+        <button class="size-btn ${item.size === 'XL' ? 'active' : ''}" onclick="changeSize(${item.id}, 'XL')">XL</button>
+      </div>
+      <div><span>ريال يمني ${Math.round(item.price * item.quantity)}</span></div>
+    `;
+    cartItemsContainer.appendChild(itemDiv);
+    total += item.price * item.quantity;
+  });
+  cartTotal.textContent = "الإجمالي: ريال يمني "+ Math.round(total);
+}
     function initiateCheckout() {
   const cart = getCart();
   if (cart.length === 0) {
     alert("عربتك فارغة! الرجاء إضافة منتجات.");
-    return;
-  }
-
-  const user = JSON.parse(localStorage.getItem("dreamtime_user"));
-  if (!user || !user.phoneNumber) {
-    window.location.href = "login.html";
     return;
   }
 
@@ -862,16 +903,6 @@
       const storedProducts = localStorage.getItem("dreamtime_products");
       if (storedProducts) {
         window.products = JSON.parse(storedProducts);
-      } else {
-        // إذا لم تكن هناك منتجات في localStorage، نستخدم القائمة الافتراضية
-        window.products = [
-          { id: 1, name: "خليجي", price: 10000, image:"صور المنتجات/خليجي/a.jpg", description: "عبايه ذات خامه ناعمه مثل الحرير.", type: "خليجي" },
-          { id: 2, name: "عبايات سوداء تقليدي", price: 7500, image: "صور المنتجات/عبايات سوداء تقليدي/a.jpg", description: "", type: "عبايات سوداء تقليدي" },
-          { id: 3, name: "عبايات تطريز خفيف", price: 8000, image: "صور المنتجات/عبايات تطريز خفيف/a.jpg", description: "", type: "عبايات تطريز خفيف" },
-          { id: 4, name: "عبايات ملونة", price: 12500, image: "صور المنتجات/عبايات ملونه/a.jpg", description: "", type: "عبايات ملونة" },
-          { id: 5, name: "عبايات تركية", price: 13000, image: "صور المنتجات/عبايات تركية/a.jpg", description: "", type: "عبايات تركية" },
-          { id: 6, name: "عبايات مطرزة", price: 15000, image: "صور المنتجات/عبايات مطرزة/a.jpg", description: "", type: "عبايات مطرزة" }
-        ];
       }
     }
 
@@ -984,70 +1015,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 function initiateCheckout() {
-  // التحقق إذا كانت العربة فارغة
   const cart = getCart();
   if (cart.length === 0) {
     alert("عربتك فارغة! الرجاء إضافة منتجات.");
     return;
   }
-
-  // التحقق إذا كان المستخدم مسجلاً دخوله
-  const user = JSON.parse(localStorage.getItem("dreamtime_user"));
-  if (!user || !user.phoneNumber) {
-    document.getElementById("loginModal").style.display = "flex"; // عرض نافذة تسجيل الدخول
-    return;
-  }
-
-  // إذا كان المستخدم مسجلاً، فنقوم بإرساله إلى صفحة الدفع
-  window.location.href = "payment.html";
-}
-// إرسال رمز التحقق (مثالي فقط، يجب استخدام خدمة حقيقية)
-function sendVerificationCode() {
-  const phoneNumber = document.getElementById("phoneNumberInput").value.trim();
-  if (!phoneNumber) {
-    alert("يرجى إدخال رقم الهاتف.");
-    return;
-  }
-
-  // في الواقع، هنا يجب إرسال رسالة نصية إلى العميل
-  // لكننا سنستخدم كوداً عشوائياً للمحاكاة
-  const code = Math.floor(1000 + Math.random() * 9000);
-  localStorage.setItem("dreamtime_verification_code", code.toString());
-  localStorage.setItem("dreamtime_user", JSON.stringify({ phoneNumber }));
-
-  document.getElementById("verificationContainer").style.display = "block";
-}
-// إرسال رمز التحقق (مثالي فقط، يجب استخدام خدمة حقيقية)
-function sendVerificationCode() {
-  const phoneNumber = document.getElementById("phoneNumberInput").value.trim();
-  if (!phoneNumber) {
-    alert("يرجى إدخال رقم الهاتف.");
-    return;
-  }
-
-  // في الواقع، هنا يجب إرسال رسالة نصية إلى العميل
-  // لكننا سنستخدم كوداً عشوائياً للمحاكاة
-  const code = Math.floor(1000 + Math.random() * 9000);
-  localStorage.setItem("dreamtime_verification_code", code.toString());
-  localStorage.setItem("dreamtime_user", JSON.stringify({ phoneNumber }));
-
-  document.getElementById("verificationContainer").style.display = "block";
-}
-
-// تحقق من رمز التحقق
-function verifyUser() {
-  const enteredCode = document.getElementById("verificationCodeInput").value.trim();
-  const storedCode = localStorage.getItem("dreamtime_verification_code");
-
-  if (enteredCode !== storedCode) {
-    alert("رمز التحقق غير صحيح.");
-    return;
-  }
-
-  alert("تم التحقق بنجاح!");
-  document.getElementById("loginModal").style.display = "none";
-
-  // انتقل إلى صفحة الدفع بعد التحقق
+  // لا حاجة لتسجيل الدخول - يتم توجيه المستخدم مباشرة إلى صفحة الدفع
   window.location.href = "payment.html";
 }
 // تحقق من التفضيل عند تحميل الصفحة
@@ -1079,22 +1052,54 @@ function toggleLightMode() {
   document.getElementById('darkThemeBtn').style.display = 'inline-block';
   document.getElementById('lightThemeBtn').style.display = 'none';
 }
+function changeSize(productId, newSize) {
+  let cart = getCart();
+  const itemIndex = cart.findIndex(item => item.id === productId);
+  if (itemIndex !== -1) {
+    cart[itemIndex].size = newSize;
+    saveCart(cart);
+    updateCartUI();
+  }
+}
+document.body.classList.toggle('dark-mode');
+window.dispatchEvent(new Event('darkModeToggle'));
+useEffect(() => {
+  const storedProducts = localStorage.getItem("dreamtime_products");
+  if (storedProducts) {
+    setProducts(JSON.parse(storedProducts));
+  }
+}, []);
+async function loadProductsFromStorage() {
+  try {
+    const response = await fetch('http://localhost:3000/api/products');
+    if (response.ok) {
+      window.products = await response.json();
+    } else {
+      window.products = [];
+    }
+  } catch (error) {
+    console.error("فشل في جلب المنتجات:", error);
+    window.products = [];
+  }
+}
+// تحديث المنتجات كل 5 ثوانٍ
+setInterval(() => {
+  loadProductsFromStorage();
+  renderProducts();
+}, 5000);
+const cors = require('cors');
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://localhost:3000'] // أضف منصاتك هنا
+}));
+const ws = new WebSocket('ws://localhost:3000');
 
+ws.onmessage = function(event) {
+  const data = JSON.parse(event.data);
+  if (data.type === 'NEW_PRODUCT') {
+    products.push(data.product);
+    renderProducts();
+  }
+};
   </script>
-  <!-- 👇 نافذة تسجيل الدخول -->
-<div id="loginModal" class="cart-modal">
-  <div class="cart-modal-content">
-    <h2>تسجيل الدخول</h2>
-    <p>يرجى إدخال رقم هاتفك:</p>
-    <input type="tel" id="phoneNumberInput" placeholder="رقم الهاتف" />
-    <button onclick="sendVerificationCode()">إرسال رمز التحقق</button>
-    <div id="verificationContainer" style="display:none;">
-      <p>أدخل رمز التحقق الذي تم إرساله إلى هاتفك:</p>
-      <input type="text" id="verificationCodeInput" placeholder="رمز التحقق (4 أرقام)" />
-      <button onclick="verifyUser()">تأكيد</button>
-    </div>
-    <button onclick="document.getElementById('loginModal').style.display='none'">إلغاء</button>
-  </div>
-</div>
 </body>
 </html>
